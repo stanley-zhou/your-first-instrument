@@ -23,10 +23,11 @@ def current_time() -> str:
 
 @mcp.tool()
 def seconds_since(iso_timestamp: str) -> str:
-    """Seconds elapsed since an ISO timestamp (e.g. '2026-09-10T17:15:00')."""
+    """Seconds elapsed since an ISO timestamp (e.g. '2026-09-10T17:15:00').
+    Naive timestamps (no timezone) are read as LOCAL time."""
     then = datetime.fromisoformat(iso_timestamp)
     if then.tzinfo is None:
-        then = then.replace(tzinfo=timezone.utc)
+        then = then.replace(tzinfo=datetime.now().astimezone().tzinfo)
     delta = datetime.now(timezone.utc) - then
     return f"{delta.total_seconds():.0f} seconds ({delta})"
 
