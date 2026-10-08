@@ -31,11 +31,29 @@ def seconds_since(iso_timestamp: str) -> str:
     delta = datetime.now(timezone.utc) - then
     return f"{delta.total_seconds():.0f} seconds ({delta})"
 
+# Dates only I would know. Claude cannot guess these; it has to ask.
+MY_DATES = {
+    "graduation": "2027-05-17",
+    "cis7000 next session": "2026-10-15",
+    # add more: "name": "YYYY-MM-DD"
+}
+
 @mcp.tool()
-def my_tool() -> str:
-    """YOURS. Rename it, give it a real purpose, make the model reach
-    something it couldn't before. (Track ideas: docs/TRACKS.md)"""
-    return "Not built yet — that's the point. Edit server.py."
+def days_until(event: str) -> str:
+    """Days until one of my personal milestones. Call with no argument or
+    an unknown name to get the list of known events."""
+    from datetime import date
+    key = event.strip().lower()
+    if key not in MY_DATES:
+        known = ", ".join(MY_DATES)
+        return f"Unknown event '{event}'. Known events: {known}"
+    target = date.fromisoformat(MY_DATES[key])
+    delta = (target - date.today()).days
+    if delta > 0:
+        return f"{delta} days until {event} ({target.isoformat()})"
+    if delta == 0:
+        return f"{event} is today ({target.isoformat()})"
+    return f"{event} was {-delta} days ago ({target.isoformat()})"
 
 if __name__ == "__main__":
     mcp.run(transport="streamable-http")
