@@ -1,10 +1,12 @@
 # One-click deploy: https://render.com → New → Blueprint → this repo.
 # Free tier note (ADR-0003): the instance sleeps when idle; first call
-# after a nap takes ~30s. Fine for an instrument; know it's there.
+# after a nap takes ~30s.
+# Dependencies (ADR-0005): installed from uv.lock, the same file local
+# `uv run` uses. Do not add a separate pip install here.
 services:
   - type: web
     name: your-first-instrument
     runtime: python
     plan: free
-    buildCommand: pip install "mcp[cli]>=1.2,<2"
-    startCommand: python server.py
+    buildCommand: pip install uv && uv sync --frozen
+    startCommand: uv run --frozen server.py
